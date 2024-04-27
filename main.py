@@ -6,21 +6,20 @@ import numpy as np
 def DatasetPreProcessing(df,columns_head_list):
 
 
-    for i in columns_head_list:
 
-        try:
+    try:
 
-            df = df.drop(columns_head_list[i], axis='columns_head_list')
-            
-            print(df)
+        df = df.drop(columns_head_list, axis='columns')
+        
+        print(df)
 
-            return df
+        return df
 
-        except Exception as error:
+    except Exception as error:
 
-            print("Error while data preprocessing ",error)
+        print("Error while data preprocessing ",error)
 
-            return None
+        return None
 
     
 
@@ -90,7 +89,7 @@ def DataNormalization(train_data, test_data):
 # load dataset
 df = LoadDataSet('dataset.csv')
 
-df = DatasetPreProcessing(df,['Main_Longitude','Longitude','Main_Latitude', ])
+df = DatasetPreProcessing(df,['Main_Longitude','Longitude','Main_Latitude','Latitude'])
 
 # aply hot encoding
 #encoded_pd = DatasetEncoding(df,['Main_Cell ID', 'Cell ID'])
