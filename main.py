@@ -6,7 +6,6 @@ import numpy as np
 def DatasetPreProcessing(df,columns_head_list):
 
 
-
     try:
 
         df = df.drop(columns_head_list, axis='columns')
@@ -28,7 +27,9 @@ def DatasetEncoding(pandas_data_frame, columns_head_list):
 
     try:
 
-        encoded_df = pd.get_dummies(pandas_data_frame, columns=['Main_Cell ID'])
+        encoded_df = pd.get_dummies(pandas_data_frame, columns=columns_head_list)
+        
+        print(encoded_df)
         
         return encoded_df
     
@@ -92,7 +93,7 @@ df = LoadDataSet('dataset.csv')
 df = DatasetPreProcessing(df,['Main_Longitude','Longitude','Main_Latitude','Latitude'])
 
 # aply hot encoding
-#encoded_pd = DatasetEncoding(df,['Main_Cell ID', 'Cell ID'])
+encoded_pd = DatasetEncoding(df,['Main_Cell ID', 'Cell ID'])
 
 
 # # get the house pricing data set
