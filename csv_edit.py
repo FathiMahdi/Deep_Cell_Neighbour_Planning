@@ -21,5 +21,4 @@ def find_replace_file(input_file, output_file):
         f.write(modified_content)
 
 
-# Replace 'Column_Name' with the actual column name containing the data to be replaced
-find_replace_file('GUL_DS.csv', 'dataset.csv')
+
