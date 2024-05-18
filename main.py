@@ -193,21 +193,20 @@ print(df)
 # train_data, test_data = dfDataNormalization(train_data,test_data)
 
 print(train_data)
-# # make Machine Learing model
+
+# make Machine Learing model
 # loaded_model = BuildModle(input_shape) // to rebuild model 
 
 # Load the saved model
 loaded_model = tf.keras.models.load_model("models/DNP_2G.h5") # load saved model
 
-loaded_model.compile(optimizer='rmsprop',loss='binary_crossentropy',metrics=["accuracy"])
 
-# trainthe model
+# train model
 loaded_model.fit(train_data, epochs=1400, validation_data=test_data)
 
-#save the model
+# save the model
 loaded_model.save("models/DNP_ALL.h5")
 
 
-# manual testing
-predictions = loaded_model.predict(test_data)
-print(predictions[0])
+
+
