@@ -7,14 +7,13 @@ import pandas as pd
 import numpy as np
 
 
+# delete unwanted columns
 def DatasetPreProcessing(df,columns_head_list):
-
 
     try:
 
         df = df.drop(columns_head_list, axis='columns')
         
-        print(df)
 
         return df
 
@@ -33,60 +32,31 @@ def ConverDFToTensorflowDSt(output, df):
         # Normalize features
         scaler = StandardScaler()
         normalized_features = scaler.fit_transform(df)
+
         # Split the dataset into training and testing sets
         train_data, test_data, train_target, test_target = train_test_split(normalized_features, target, test_size=0.2, random_state=42)
+
         # Convert features and targets to float32
         train_features = tf.constant(train_data, dtype=tf.float32)
         test_features = tf.constant(test_data, dtype=tf.float32)
         train_target = tf.constant(train_target.values, dtype=tf.float32)
         test_target = tf.constant(test_target.values, dtype=tf.float32)
+
         # Combine features and targets into tuples
         train_dataset = tf.data.Dataset.from_tensor_slices((train_features, train_target))
         test_dataset = tf.data.Dataset.from_tensor_slices((test_features, test_target))
+
         # Add batch dimension to datasets
-        train_dataset = train_dataset.batch(32)
-        test_dataset = test_dataset.batch(32)
+        train_dataset = train_dataset.batch(128*2)
+        test_dataset = test_dataset.batch(128*2)
+
+
         # Return datasets with input shape and batch dimension
         return (train_dataset, train_target), (test_dataset, test_target), train_features.shape[1:]  
     
     except Exception as e:
         print("Cannot convert pandas dataframe to TensorFlow:", e)
         return None
-
-
-      
-
-def ConverDFToTensorflowDS(output,df):
-
-    target = df.pop(output)
-
-    try:
-
-        # Split the dataset into training and testing sets
-        train_data, test_data, train_target, test_target = train_test_split(df, target, test_size=0.2, random_state=42)
-
-
-        # Create TensorFlow datasets for training and testing
-        train_dataset = tf.data.Dataset.from_tensor_slices((train_data.values, train_target.values))
-        test_dataset = tf.data.Dataset.from_tensor_slices((test_data.values, test_target.values))
-
-        # Print some samples from the datasets
-        print("Training dataset samples:")
-        for features, targets in train_dataset.take(5):
-            print('Features: {}, Target: {}'.format(features, targets))
-
-        print("Testing dataset samples:")
-        for features, targets in test_dataset.take(5):
-            print('Features: {}, Target: {}'.format(features, targets))
-        
-
-        return train_dataset, test_dataset
-    
-    except Exception as e:
-
-        print("Cannot conver pandas dataframe to tensorflow: ",e)
-
-
 
 
 
@@ -109,29 +79,44 @@ def DatasetEncoding(pandas_data_frame, columns_head_list):
 
 
 
+# convert .csv dataset to pandas dataframe
 def LoadDataSet(dataset_path):
 
     try:
 
         df = pd.read_csv(dataset_path)
 
-        print(df)
+        return df
 
     except  Exception as error:
 
         print("- Cannot load dataset!! ",error)
 
-    return df
-    
-# 
-def BuildModle(input_shape):
+        return None
 
+    
+
+
+# Function to scale angles from 0-360 to -180 to 180
+def scale_angle(angle):
+    if angle > 180:
+        return angle - 360
+    else:
+        return angle
+    
+
+# build tensorflow model
+def BuildModle(input_shape):
     model = keras.Sequential() # create a new model
-    model.add(keras.layers.Dense(64,activation="relu",input_shape=input_shape)) # add one layer whit 64 neuron 
-    model.add(keras.layers.Dense(64,activation="relu"))# add one layer whit 64 neuron 
-    model.add(keras.layers.Dense(64,activation="relu"))# add one layer whit 64 neuron 
-    model.add(keras.layers.Dense(1)) # add output layer
-    model.compile(optimizer='rmsprop',loss='mse',metrics=["mae"]) # model compilation
+    model.add(keras.layers.Dense(64,activation="relu")) 
+    model.add(keras.layers.Dense(64,activation="relu")) 
+    model.add(keras.layers.Dense(32,activation="relu")) 
+    model.add(keras.layers.Dense(16,activation="relu")) 
+    model.add(keras.layers.Dense(8,activation="relu")) 
+    model.add(keras.layers.Dense(4,activation="relu")) 
+    model.add(keras.layers.Dense(2,activation="relu")) 
+    model.add(keras.layers.Dense(1, activation='sigmoid'))
+    model.compile(optimizer='rmsprop',loss='binary_crossentropy',metrics=["accuracy"]) # model compilation
     return model
 
 
@@ -155,6 +140,7 @@ def DataNormalization(train_data, test_data):
     return train_data, test_data
 
 
+# value normalization
 def dfDataNormalization(train_data, test_data):
 
     # Compute mean and standard deviation using the training dataset
@@ -171,51 +157,57 @@ def dfDataNormalization(train_data, test_data):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-# Modify the mane cell ID name and cell ID
+# Modify the main cell ID name and cell ID
 find_replace_file('GUL_DS.csv', 'dataset.csv')
+
+
+# for extracting 2G data only
+# generate_2g_csv('dataset.csv', 'dataset.csv')
 
 # load dataset
 df = LoadDataSet('dataset.csv')
 
 
-df = DatasetPreProcessing(df,['Main_Longitude','Longitude','Main_Latitude','Latitude'])
+# remove unwanted columns
+df = DatasetPreProcessing(df,['Cell ID', 'Main_Cell ID'] )
+
+
+# angle scalling
+df['Azimuth'] = df['Azimuth'].apply(scale_angle)
+df['Main_Azimuth'] = df['Main_Azimuth'].apply(scale_angle)
+
+
+# show dataframe
+print(df)
+
 
 # aply hot encoding
-encoded_pd = DatasetEncoding(df,['Main_Cell ID', 'Cell ID'])
+# encoded_pd = DatasetEncoding(df,['Main_Cell ID', 'Cell ID'])
 
 
-# convert df to tensorflow dataset
-#tf_dataset = ConverDFToTensorflowDS('is_NBR',encoded_pd)
-
-
-# # get the house pricing data set
-#(train_data, train_target), (test_data, test_target) = tf_dataset.load_data()
-
-(train_data, train_target), (test_data, test_target), input_shape = ConverDFToTensorflowDSt('is_NBR', encoded_pd)
+# split data set
+(train_data, train_target), (test_data, test_target), input_shape = ConverDFToTensorflowDSt('is_NBR', df)
 
 
 # # implement data normalization
-#train_data, test_data = dfDataNormalization(train_data,test_data)
+# train_data, test_data = dfDataNormalization(train_data,test_data)
 
-
+print(train_data)
 # # make Machine Learing model
-model = BuildModle(input_shape)
+# loaded_model = BuildModle(input_shape) // to rebuild model 
 
-# # trainthe model
-#model.fit(train_data, train_target)
-model.fit(train_data, epochs=100, validation_data=test_data)
+# Load the saved model
+loaded_model = tf.keras.models.load_model("models/DNP.h5") # load saved model
+
+loaded_model.compile(optimizer='rmsprop',loss='binary_crossentropy',metrics=["accuracy"])
+
+# trainthe model
+loaded_model.fit(train_data, epochs=1400, validation_data=test_data)
 
 #save the model
-model.save("models/DNP.h5")
+loaded_model.save("models/DNP.h5")
 
+
+# manual testing
+predictions = loaded_model.predict(test_data)
+print(predictions[0])
