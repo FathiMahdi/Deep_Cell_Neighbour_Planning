@@ -1,4 +1,8 @@
-# Deep_Cell_Neighbour_Planning
+# Deep Cell Neighbour Planning
+
+## description
+
+This project is about using AI for telecommunications network cellular tower planing, the AI model takes the main cel information and the neighbour cell information and predict the relation. The model is based on logistic regression so the output neuron gives 1/0.
 
 ## Required parameters
 
@@ -10,6 +14,12 @@
 - Azimuth
 - Distance_km
 
+## Models
+
+| **Model  Name** | **Description** | **Accuracy** |
+| :---            | :---            | :---         |
+| DNP_2G          | trained with 2G data only | 93.4 %      |
+| DNP_ALL         | trained with 2G, 3G, and 4G data | 86.3 % |
 
 ## How to perform prediction
 
