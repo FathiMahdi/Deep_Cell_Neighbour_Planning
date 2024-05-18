@@ -197,7 +197,7 @@ print(train_data)
 # loaded_model = BuildModle(input_shape) // to rebuild model 
 
 # Load the saved model
-loaded_model = tf.keras.models.load_model("models/DNP.h5") # load saved model
+loaded_model = tf.keras.models.load_model("models/DNP_2G.h5") # load saved model
 
 loaded_model.compile(optimizer='rmsprop',loss='binary_crossentropy',metrics=["accuracy"])
 
@@ -205,7 +205,7 @@ loaded_model.compile(optimizer='rmsprop',loss='binary_crossentropy',metrics=["ac
 loaded_model.fit(train_data, epochs=1400, validation_data=test_data)
 
 #save the model
-loaded_model.save("models/DNP.h5")
+loaded_model.save("models/DNP_ALL.h5")
 
 
 # manual testing
