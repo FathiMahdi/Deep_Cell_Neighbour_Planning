@@ -1,7 +1,17 @@
 # Deep_Cell_Neighbour_Planning
 
+## Required parameters
 
-# How to perform prediction
+- Main_Longitude
+- Main_Latitude
+- Main_Azimuth
+- Longitude
+- Latitude
+- Azimuth
+- Distance_km
+
+
+## How to perform prediction
 
 ```python
 loaded_model = tf.keras.models.load_model("models/DNP_2G.h5") # load saved model
