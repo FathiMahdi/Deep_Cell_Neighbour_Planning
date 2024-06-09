@@ -220,21 +220,41 @@ loaded_model = tf.keras.models.load_model("models/DNP_2G_ENCODED.keras") # load 
 # loaded_model.save("models/DNP_2G_ENCODED.keras")
 
 
-test_input = [32.60809,15.62671,240-360,32.61153,15.63867,350-360]
+test_input_1 = [32.5394,15.66323,120,32.5352,15.6679,140] # 0
+
+test_input_2 = [32.48817,15.71827,25,32.49186,15.72213,130] # 1
+
+test_input_3 = [32.56781,15.66145,305-360,32.5746,15.65402,240-360] # 0 
+
+test_input_4 = [32.48817,15.71827,230-360,32.4792,15.7097,10] # 1
+
+test_input_5 = [32.652542,15.475766,315-360,32.6297,15.4461,0] # 1
+
+test_input_6 = [32.5394,15.66323,270-360,32.54262,15.66544,160] # 0
+
+test_input_7 = [32.48817,15.71827,120,32.4988,15.7228,260-360] # 1
+
+test_input_8 = [32.5819,15.7279,130,32.56692,15.73135,160] # 0
+
+test_input_9 = [32.652542,15.475766,315-360,32.652542,15.475766,210-360] # 1
+
+test_input_10 = [32.5394,15.66323,0,32.5396,15.6564,260-360] # 0
+
+
 # test_input = [32.53844,15.44687,237,32.5249,15.4633,0]
 
-df = pd.DataFrame(test_input)
+df = pd.DataFrame(test_input_1)
 
 scaler = StandardScaler()
 
 normalized_features = scaler.fit_transform(df)
 
 
-test_input = np.array(normalized_features).reshape(1, -1)
+test_input_1 = np.array(normalized_features).reshape(1, -1)
 
 
 # Make predictions
-predictions = loaded_model.predict(test_input)
+predictions = loaded_model.predict(test_input_1)
 
 
 print("Prediction:",int(predictions[0][0]),int(predictions[0][1]))

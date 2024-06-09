@@ -1,5 +1,35 @@
 import pandas as pd
 import re
+import numpy as np
+import math 
+
+def convert_to_vector(longitude, latitude, azimuth):
+    # Convert latitude and longitude to radians
+    lat_rad = math.radians(latitude)
+    lon_rad = math.radians(longitude)
+    
+    # Convert azimuth to radians
+    az_rad = math.radians(azimuth)
+    
+    # Calculate x, y, z components of the vector
+    x = math.cos(lat_rad) * math.cos(lon_rad) * math.cos(az_rad)
+    y = math.cos(lat_rad) * math.sin(lon_rad) * math.cos(az_rad)
+    z = math.sin(lat_rad) * math.sin(az_rad)
+    
+    return x, y, z
+
+def process_data_set(csv_path = "dataset.csv"):
+
+    df = pd.read_csv(csv_path)
+
+    # get cos(azimuth)
+    df['cos_Main_Azimuth'] = np.cos(np.radians(df['Main_Azimuth']))
+    df['cos_Azimuth'] = np.cos(np.radians(df['Azimuth']))
+
+    df['Main_Vector_X'], df['Main_Vector_Y'], df['Main_Vector_Z'] = zip(*df.apply(lambda row: convert_to_vector(row['Main_Longitude'], row['Main_Latitude'], row['Main_Azimuth']), axis=1))
+    df['Vector_X'], df['Vector_Y'], df['Vector_Z'] = zip(*df.apply(lambda row: convert_to_vector(row['Longitude'], row['Latitude'], row['Azimuth']), axis=1))
+
+    df.to_csv('processed_dataset.csv', index=False)
 
 
 def generate_2g_csv(input_file, output_file):

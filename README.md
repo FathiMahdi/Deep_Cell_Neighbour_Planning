@@ -12,27 +12,62 @@ This project is about using AI for telecommunications network cellular tower pla
 - Longitude
 - Latitude
 - Azimuth
-- Distance_km
+
 
 ## Models
 
 | **Model  Name** | **Description** | **Accuracy** |
 | :---            | :---            | :---         |
-| DNP_2G          | trained with 2G data only | 93.4 %      |
-| DNP_ALL         | trained with 2G, 3G, and 4G data | 86.3 % |
+| decision_tree_model.pkl        | trained with 2G data only | 94.38 %      |
+| knn_model.pkl   | trained with 2G data only | 94.16 % |
 
 ## How to perform prediction
 
+- check test.py
+
 ```python
-loaded_model = tf.keras.models.load_model("models/DNP_2G.h5") # load saved model
+from DNP import DNP
+from sklearn.model_selection import train_test_split
 
-test_input = [32.5399,15.5947,315,32.5399,15.5947,125,0]
+dnp = DNP()
 
-test_input = np.array(test_input)
+# Load data
+data = dnp.load_data('dataset.csv')
 
-test_input = test_input.reshape(1, -1)
+# Load models
+dnp.load_model("models/decision_tree_model.pkl","models/scaler.pkl") # you also can specify you file directory and name
 
-predictions = loaded_model.predict(test_input)
 
-print("Prediction:", predictions)
+###########################
+
+# [!NOTE]
+# No need to modify the angle 
+# Just use the same azimuth angle representation (! same as in your dataset)
+
+########################
+
+
+# for multi data like filtered data
+multi_list = \
+[
+    [32.5711,15.4985,205,32.57133,15.50351,285],
+    [32.652542,15.475766,315,32.63956,15.50159,240],
+    [32.71825,15.68753,270,32.71825,15.68753,180],
+    [32.5314,15.6435,180,32.52401,15.63674,110],
+    [32.5314,15.6435,180,32.54,15.6419,270],
+    [32.5314,15.6435,180,32.538704,15.63589,260],
+    [32.5711,15.4985,205,32.56532,15.4994,0],
+    [32.4365,15.6193,240,32.4321,15.6292,290],
+    [32.4365,15.6193,240,32.4321,15.6292,120],
+    [32.4365,15.6193,240,32.4321,15.6292,0],
+]
+
+
+# for single list
+single_sample = [32.652542,15.475766,315,32.63956,15.50159,240] # should give 1
+
+# Inference using loaded models
+prediction = dnp.predict(multi_list)
+
+print("Prediction: ", prediction)
 ```
