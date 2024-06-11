@@ -7,8 +7,8 @@ dnp = DNP()
 data = dnp.load_data('dataset.csv')
 
 # Load models
-dnp.load_model("models/decision_tree_model.pkl","models/scaler.pkl") # you also can specify you file directory and name
-
+# dnp.load_model("models/decision_tree_model.pkl","models/scaler.pkl") # you also can specify you file directory and name
+dnp.load_model("models/decision_tree_model_all_old.pkl","models/scaler_all_old.pkl") # you also can specify you file directory and name
 
 ###########################
 
@@ -81,14 +81,21 @@ new_data_with_distance = \
 [32.5473, 15.5691, 20, 32.5431, 15.5692, 180, 0.4506309710551085], 
 [32.5473, 15.5691, 20, 32.5431, 15.5692, 300, 0.4506309710551085], 
 [32.5473, 15.5691, 20, 32.5459, 15.5784, 140, 1.0399834440786437], 
-[32.5473, 15.5691, 20, 32.559681, 15.575294, 70, 1.4944172122515675], 
+[32.5473, 15.5691, 20, 32.559681, 15.575294, 70, 1.44172122515675], 
 [32.5473, 15.5691, 20, 32.5562, 15.56594, 310, 1.016652432667904], 
 [32.5473, 15.5691, 20, 32.55084, 15.571843, 190, 0.48610682403365624]]
 
+# [1110010001011] 3 ans
+
+data = dnp.load_data('zeko.csv')
+X = data[['Main_Longitude', 'Main_Latitude', 'Main_Azimuth','Longitude', 'Latitude', 'Azimuth','Distance_km']]
+
+
 # for single list
-single_sample = [32.652542,15.475766,315,32.63956,15.50159,240] # should give 1
+single_sample = [32.5473, 15.5691, 20, 32.5444, 15.5741, 130, 0.5]# should give 1
 
 # Inference using loaded models
-prediction = dnp.predict(new_sample)
+prediction, confidance = dnp.predict(X)
 
 print("Prediction: ", prediction)
+print("confidance: ", confidance)

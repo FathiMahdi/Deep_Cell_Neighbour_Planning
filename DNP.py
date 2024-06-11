@@ -8,6 +8,7 @@ import joblib
 from sklearn.neural_network import MLPClassifier
 from sklearn.svm import SVC
 import math
+import numpy as np 
 
 # Deep Cell Neighbour Planning
 class DNP:
@@ -70,9 +71,13 @@ class DNP:
 
     def predict(self, input_data):
 
-        if isinstance(input_data[0], list):
+        if isinstance(input_data, pd.DataFrame):
+            X = input_data
+        
+        elif isinstance(input_data[0], list):
   
             X = pd.DataFrame(input_data, columns=['Main_Longitude', 'Main_Latitude', 'Main_Azimuth','Longitude', 'Latitude', 'Azimuth','Distance_km'])
+
         else:
      
             X = pd.DataFrame([input_data], columns=['Main_Longitude', 'Main_Latitude', 'Main_Azimuth','Longitude', 'Latitude', 'Azimuth','Distance_km'])
@@ -81,10 +86,10 @@ class DNP:
         X_scaled = self.scaler.transform(X)
         
 
- 
         prediction = self.user_selected_model.predict(X_scaled)
-        
-        return prediction
+        confidence = self.user_selected_model.predict_proba(X, check_input=True)
+
+        return prediction, confidence
 
 
     def load_model(self, model_path,scaler_path):
